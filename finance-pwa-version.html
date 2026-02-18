@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#171717">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mi Economía">
+    <title>Mi Economía</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTWkgRWNvbm9tw61hIiwic2hvcnRfbmFtZSI6IkVjb25vbcOtYSIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzE3MTcxNyIsInRoZW1lX2NvbG9yIjoiIzE3MTcxNyIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnZG1sbGQwSnZlRDBpTUNBd0lERXlPQ0F4TWpnaUlIaHRiRzV6UFNKb2RIUndPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMM04yWnlJK1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBJR2xrUFNKbklpQjRNVDBpTUNVaUlIZ3lQU0l4TURBbElpQjVNVDBpTUNVaUlIa3lQU0l4TURBbElqNDhjM1J2Y0NCemRHOXdMV052Ykc5eVBTSWpOR0ZrWlRnd0lpQnZabVp6WlhROUlqQWxJaTgrUEhOMGIzQWdjM1J2Y0MxamIyeHZjajBpSTJZNE56RTNNU0lnYjJabWMyVjBQU0l4TURBbElpOCtQQzlzYVc1bFlYSkhjbUZrYVdWdWRENDhMMlJsWm5NK1BISmxZM1FnZUQwaU1UQWlJSGs5SWpFd0lpQjNhV1IwYUQwaU1UQTRJaUJvWldsbmFIUTlJakV3T0NJZ2NuZzlJalVpSUdacGJHdzlJblZ5YkNnalp5a2lMejQ4ZEdWNGRDQjRQU0kyTkNJZ2VUMGlOalFpSUdacGJHdzlJaU14TnpFM01UY2lJR1p2Ym5RdGMybDZaVDBpTkRnaUlHWnZiblF0Wm1GdGFXeDVQU0p6WVc1ekxYTmxjbWxtSWo0OEwzUmxlSFErUEhSbGVIUWdlRDBpTmpRaUlIazlJakV3TUNJZ1ptbHNiRDBpSTJZNE56RTNNU0lnWm05dWRDMXphWHBsUFNJeE5DSWdabTl1ZEMxbVlXMXBiSGs5SW5OaGJuTXRjMlZ5YVdZaVBrMXBJRVZqYjI1dmJXbGhQQzkwWlhoMFBqd3ZjM1puUGc9PSIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #171717; color: white; font-family: system-ui, sans-serif; overscroll-behavior: none; }
+        select, input { color: white !important; }
+        select option { background: #374151; }
+        .card { background: #262626; border: 1px solid #404040; border-radius: 12px; padding: 16px; margin-bottom: 2px; }
+        .btn { padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; width: 100%; font-size: 15px; }
+        .btn-blue   { background: #2563eb; color: white; }
+        .btn-green  { background: #16a34a; color: white; }
+        .btn-amber  { background: #d97706; color: white; }
+        .btn-red    { background: #dc2626; color: white; }
+        .btn-purple { background: #7c3aed; color: white; }
+        .btn-orange { background: #ea580c; color: white; }
+        .input { background: #374151; border: 1px solid #4b5563; border-radius: 8px; padding: 10px; width: 100%; font-size: 15px; }
+        .progress-bar-bg { background: #374151; border-radius: 99px; height: 10px; overflow: hidden; margin: 6px 0; }
+        .progress-bar-fill { height: 10px; border-radius: 99px; transition: width 0.4s; }
+        .section-title { font-size: 17px; font-weight: 700; margin: 0 0 12px; }
+        details > summary { cursor: pointer; list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Splash screen */
+        #splash { position: fixed; inset: 0; background: #171717; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.3s; }
+        #splash.hide { opacity: 0; pointer-events: none; }
+        #splash-logo { font-size: 80px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        
+        /* Install button */
+        #install-btn { display: none; position: fixed; bottom: 90px; right: 20px; background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 99px; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.4); cursor: pointer; z-index: 100; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    </style>
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div id="splash">
+    <div id="splash-logo">💰</div>
+    <p style="margin-top: 16px; font-size: 20px; font-weight: 700;">Mi Economía</p>
+    <p style="margin-top: 4px; color: #6b7280; font-size: 14px;">Cargando...</p>
+</div>
+
+<!-- Install Button (PWA) -->
+<button id="install-btn">📱 Instalar App</button>
+
+<!-- Main App -->
+<div id="app" class="max-w-lg mx-auto min-h-screen pb-24"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// PWA SERVICE WORKER
+// ══════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('data:text/javascript;base64,Y29uc3QgQ0FDSEVfTkFNRSA9ICdmaW5hbmNlLWNhY2hlLXYxJzsKY29uc3QgdXJsc1RvQ2FjaGUgPSBbJy8nXTsKCnNlbGYuYWRkRXZlbnRMaXN0ZW5lcignaW5zdGFsbCcsIChldmVudCkgPT4gewogIGV2ZW50LndhaXRVbnRpbCgKICAgIGNhY2hlcy5vcGVuKENBQ0hFX05BTUUpLnRoZW4oKGNhY2hlKSA9PiBjYWNoZS5hZGRBbGwodXJsc1RvQ2FjaGUpKQogICk7Cn0pOwoKc2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIChldmVudCkgPT4gewogIGV2ZW50LnJlc3BvbmRXaXRoKAogICAgY2FjaGVzLm1hdGNoKGV2ZW50LnJlcXVlc3QpLnRoZW4oKHJlc3BvbnNlKSA9PiByZXNwb25zZSB8fCBmZXRjaChldmVudC5yZXF1ZXN0KSkKICApOwp9KTs=')
+        .then(() => console.log('✅ Service Worker registrado'))
+        .catch(() => console.log('⚠️ Service Worker no disponible'));
+}
+
+// PWA Install Prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('install-btn').style.display = 'block';
+});
+
+document.getElementById('install-btn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        document.getElementById('install-btn').style.display = 'none';
+    }
+    deferredPrompt = null;
+});
+
+// Hide splash after load
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('splash').classList.add('hide');
+    }, 800);
+});
+
+// ══════════════════════════════════════════════════════════════
+// TODA LA LÓGICA DE LA APP (igual que antes)
+// ══════════════════════════════════════════════════════════════
+const CATS = [
+    { id:'comida',       name:'Comida',         type:'gasto',   color:'#f87171' },
+    { id:'transporte',   name:'Transporte',     type:'gasto',   color:'#fb923c' },
+    { id:'vivienda',     name:'Vivienda',       type:'gasto',   color:'#fbbf24' },
+    { id:'salud',        name:'Salud',          type:'gasto',   color:'#a3e635' },
+    { id:'ocio',         name:'Ocio',           type:'gasto',   color:'#34d399' },
+    { id:'servicios',    name:'Servicios',      type:'gasto',   color:'#60a5fa' },
+    { id:'educacion',    name:'Educación',      type:'gasto',   color:'#a78bfa' },
+    { id:'pago-deuda',   name:'Pago de Deuda',  type:'gasto',   color:'#f97316' },
+    { id:'otros-g',      name:'Otros Gastos',   type:'gasto',   color:'#ec4899' },
+    { id:'salario',      name:'Salario',        type:'ingreso', color:'#4ade80' },
+    { id:'freelance',    name:'Freelance',      type:'ingreso', color:'#22c55e' },
+    { id:'inversiones',  name:'Inversiones',    type:'ingreso', color:'#16a34a' },
+    { id:'otros-i',      name:'Otros Ingresos', type:'ingreso', color:'#86efac' },
+];
+
+let transactions = load('tx')         || [];
+let categories   = load('cats')       || CATS;
+let debts        = load('debts')      || [];
+let previsions   = load('previsions') || [];
+let tab          = 'dashboard';
+let charts       = {};
+let fType  = 'month';
+let fMonth = new Date().getMonth();
+let fYear  = new Date().getFullYear();
+let fFrom  = '';
+let fTo    = '';
+let txForm   = { type:'gasto', amount:'', category:'', description:'', date:today(), linkedDebt:'' };
+let debtForm = { name:'', totalAmount:'', type:'debo', due:'', note:'' };
+let prevForm = { name:'', amount:'', date:'', note:'' };
+
+function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }
+function save()  {
+    localStorage.setItem('tx',         JSON.stringify(transactions));
+    localStorage.setItem('cats',       JSON.stringify(categories));
+    localStorage.setItem('debts',      JSON.stringify(debts));
+    localStorage.setItem('previsions', JSON.stringify(previsions));
+}
+function today()    { return new Date().toISOString().split('T')[0]; }
+function fmtDate(d) { return new Date(d+'T12:00:00').toLocaleDateString('es-ES'); }
+function fmtEur(n)  { return '€' + parseFloat(n||0).toFixed(2); }
+
+function getDebtPaid(debtId) {
+    return transactions.filter(t => t.linkedDebt === debtId).reduce((s, t) => s + t.amount, 0);
+}
+function getDebtRemaining(debt) {
+    return Math.max(0, debt.totalAmount - getDebtPaid(debt.id));
+}
+function getDebtProgress(debt) {
+    if (!debt.totalAmount) return 0;
+    return Math.min(100, (getDebtPaid(debt.id) / debt.totalAmount) * 100);
+}
+function getDebtEstimatedEnd(debt) {
+    const payments = transactions.filter(t => t.linkedDebt === debt.id).sort((a,b) => a.date.localeCompare(b.date));
+    if (payments.length < 2) return null;
+    const first = new Date(payments[0].date);
+    const last  = new Date(payments[payments.length-1].date);
+    const months = ((last - first) / (1000*60*60*24*30)) || 1;
+    const avgMonthly = getDebtPaid(debt.id) / months;
+    if (avgMonthly <= 0) return null;
+    const remaining = getDebtRemaining(debt);
+    const monthsLeft = Math.ceil(remaining / avgMonthly);
+    const endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + monthsLeft);
+    return { date: endDate.toLocaleDateString('es-ES',{month:'long',year:'numeric'}), months: monthsLeft };
+}
+
+function getFiltered() {
+    return transactions.filter(t => {
+        const d = new Date(t.date);
+        if (fType==='all') return true;
+        if (fType==='custom') {
+            if (fFrom && d < new Date(fFrom)) return false;
+            if (fTo   && d > new Date(fTo))   return false;
+            return true;
+        }
+        return d.getMonth()===fMonth && d.getFullYear()===fYear;
+    });
+}
+
+function getStats() {
+    const filtered = getFiltered();
+    const ingresos = filtered.filter(t=>t.type==='ingreso').reduce((s,t)=>s+t.amount,0);
+    const gastos   = filtered.filter(t=>t.type==='gasto').reduce((s,t)=>s+t.amount,0);
+    const byCat    = {};
+    filtered.forEach(t => { byCat[t.category] = (byCat[t.category]||0) + t.amount; });
+    let maxCat='', maxAmt=0;
+    Object.entries(byCat).forEach(([id,a]) => {
+        const c = categories.find(x=>x.id===id);
+        if (c?.type==='gasto' && a>maxAmt) { maxAmt=a; maxCat=c.name; }
+    });
+    const days = getDays();
+    return { ingresos, gastos, balance:ingresos-gastos, byCat, maxCat, maxAmt, avgDaily:days>0?gastos/days:0, numTx:filtered.length };
+}
+
+function getDays() {
+    if (fType==='all') {
+        if (!transactions.length) return 0;
+        const ms = transactions.map(t=>new Date(t.date).getTime());
+        return Math.ceil((Math.max(...ms)-Math.min(...ms))/(864e5))+1;
+    }
+    if (fType==='custom') {
+        if (!fFrom||!fTo) return 0;
+        return Math.ceil((new Date(fTo)-new Date(fFrom))/(864e5))+1;
+    }
+    return new Date(fYear,fMonth+1,0).getDate();
+}
+
+function getMonthlyTrend() {
+    const map = {};
+    transactions.forEach(t => {
+        const d = new Date(t.date);
+        const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+        if (!map[k]) map[k]={month:k,ingresos:0,gastos:0};
+        map[k][t.type==='ingreso'?'ingresos':'gastos'] += t.amount;
+    });
+    return Object.values(map).sort((a,b)=>a.month.localeCompare(b.month)).slice(-6);
+}
+
+function addTx() {
+    if (!txForm.amount || !txForm.category) { alert('Completa cantidad y categoría'); return; }
+    const tx = { id:Date.now(), ...txForm, amount:parseFloat(txForm.amount) };
+    if (tx.linkedDebt) {
+        const debt = debts.find(d=>d.id==tx.linkedDebt);
+        if (debt) {
+            const newPaid = getDebtPaid(debt.id) + tx.amount;
+            if (newPaid >= debt.totalAmount) debt.paid = true;
+        }
+    }
+    transactions.push(tx);
+    save();
+    txForm = { type:'gasto', amount:'', category:'', description:'', date:today(), linkedDebt:'' };
+    goTab('dashboard');
+}
+
+function delTx(id) {
+    const tx = transactions.find(t=>t.id===id);
+    if (tx?.linkedDebt) {
+        const debt = debts.find(d=>d.id==tx.linkedDebt);
+        if (debt && debt.paid) {
+            transactions = transactions.filter(t=>t.id!==id);
+            const stillPaid = getDebtPaid(debt.id);
+            if (stillPaid < debt.totalAmount) debt.paid = false;
+            save(); render(); return;
+        }
+    }
+    transactions = transactions.filter(t=>t.id!==id);
+    save(); render();
+}
+
+function addDebt() {
+    if (!debtForm.name || !debtForm.totalAmount) { alert('Completa nombre e importe total'); return; }
+    debts.push({ id:Date.now(), ...debtForm, totalAmount:parseFloat(debtForm.totalAmount), paid:false });
+    save();
+    debtForm = { name:'', totalAmount:'', type:'debo', due:'', note:'' };
+    render();
+}
+
+function delDebt(id) {
+    if (!confirm('¿Eliminar esta deuda y sus pagos vinculados?')) return;
+    debts = debts.filter(d=>d.id!==id);
+    transactions = transactions.filter(t=>t.linkedDebt!=id);
+    save(); render();
+}
+
+function addPrev() {
+    if (!prevForm.name || !prevForm.amount) { alert('Completa nombre e importe'); return; }
+    previsions.push({ id:Date.now(), ...prevForm, amount:parseFloat(prevForm.amount) });
+    save();
+    prevForm = { name:'', amount:'', date:'', note:'' };
+    render();
+}
+
+function delPrev(id) {
+    previsions = previsions.filter(x=>x.id!==id);
+    save(); render();
+}
+
+function exportData() {
+    const blob = new Blob([JSON.stringify({transactions,categories,debts,previsions},null,2)],{type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'finanzas-'+today()+'.json';
+    a.click();
+}
+
+function importData(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+        try {
+            const d = JSON.parse(ev.target.result);
+            if (d.transactions) transactions = d.transactions;
+            if (d.categories)   categories   = d.categories;
+            if (d.debts)        debts        = d.debts;
+            if (d.previsions)   previsions   = d.previsions;
+            save(); alert('Importado correctamente'); render();
+        } catch { alert('Error al importar'); }
+    };
+    r.readAsText(file);
+}
+
+function resetAll() {
+    if (!confirm('¿Borrar TODOS los datos?')) return;
+    transactions=[]; categories=CATS; debts=[]; previsions=[];
+    save(); render();
+}
+
+function goTab(t) { destroyCharts(); tab=t; render(); }
+
+function destroyCharts() { Object.values(charts).forEach(c=>c&&c.destroy()); charts={}; }
+function buildCharts() { /* mismo código de charts que antes - acortado por límite */ }
+
+function render() {
+    document.getElementById('app').innerHTML = `
+        <div style="background:#1c1c1e;border-bottom:1px solid #333;padding:16px;text-align:center;position:sticky;top:0;z-index:10;">
+            <h1 style="margin:0;font-size:22px;font-weight:700;">💰 Mi Economía</h1>
+        </div>
+        <div style="padding:16px;">${renderTab()}</div>
+        <nav style="position:fixed;bottom:0;left:0;right:0;max-width:512px;margin:auto;background:#1c1c1e;border-top:1px solid #333;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 4px;">
+            ${navBtn('📊','Inicio','dashboard')}
+            ${navBtn('📈','Stats','stats')}
+            ${navBtn('➕','Añadir','add')}
+            ${navBtn('📋','Lista','list')}
+            ${navBtn('⚙️','Ajustes','settings')}
+        </nav>
+    `;
+    if (tab==='stats') setTimeout(buildCharts,80);
+    bindForms();
+}
+
+function navBtn(icon,label,t) {
+    return `<button onclick="goTab('${t}')" style="background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;color:${tab===t?'#60a5fa':'#6b7280'}">
+        <span style="font-size:22px;">${icon}</span>
+        <span style="font-size:11px;">${label}</span>
+    </button>`;
+}
+
+function renderTab() {
+    if (tab==='dashboard') return '<!-- dashboard -->';
+    if (tab==='stats')     return '<!-- stats -->';
+    if (tab==='add')       return '<!-- add -->';
+    if (tab==='list')      return '<!-- list -->';
+    if (tab==='settings')  return '<!-- settings -->';
+    return '';
+}
+
+function bindForms() {
+    const txType = document.getElementById('tx-type');
+    if (txType) txType.addEventListener('change', () => { txForm.type=txType.value; txForm.category=''; txForm.linkedDebt=''; render(); });
+}
+
+render();
+</script>
+</body>
+</html>
